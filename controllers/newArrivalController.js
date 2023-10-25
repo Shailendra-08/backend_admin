@@ -1,4 +1,3 @@
-const Product = require('../models/productModel');
 const NewArrival = require('../models/newArrivalModel');
 const ErrorHandler = require('../utils/ErrorHandler');
 const catchAsyncError = require('../middleware/CatchAsyncErrors');
@@ -17,7 +16,7 @@ exports.createProduct = catchAsyncError(async (req, res, next) => {
     newImages.push({ public_id, url });
   }
   req.body.images = [...newImages];
-  const product = await Product.create(req.body);
+  const product = await NewArrival.create(req.body);
   res.status(200).json({
     success: true,
     data: product,
@@ -27,11 +26,11 @@ exports.createProduct = catchAsyncError(async (req, res, next) => {
 // update an existing product
 exports.updateProduct = catchAsyncError(async (req, res, next) => {
   if (!req.params.id) {
-    return next(new ErrorHandler('Product Not Found', 400));
+    return next(new ErrorHandler('NewArrival Not Found', 400));
   }
-  let product = await Product.findById(req.params.id);
+  let product = await NewArrival.findById(req.params.id);
   if (!product) {
-    return next(new ErrorHandler('Product Not Found', 200));
+    return next(new ErrorHandler('NewArrival Not Found', 200));
   }
   let images = req.body.images;
   let newImages = [];
@@ -46,7 +45,7 @@ exports.updateProduct = catchAsyncError(async (req, res, next) => {
     }
   }
   req.body.images = [...newImages];
-  product = await Product.findByIdAndUpdate(req.params.id, req.body, {
+  product = await NewArrival.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
     useFindAndModify: false,
@@ -60,11 +59,11 @@ exports.updateProduct = catchAsyncError(async (req, res, next) => {
 // delete an existing product
 exports.deleteProduct = catchAsyncError(async (req, res, next) => {
   if (!req.params.id) {
-    return next(new ErrorHandler('Product Not Found', 400));
+    return next(new ErrorHandler('NewArrival Not Found', 400));
   }
-  const product = await Product.findById(req.params.id);
+  const product = await NewArrival.findById(req.params.id);
   if (!product) {
-    return next(new ErrorHandler('Product Not Found', 200));
+    return next(new ErrorHandler('NewArrival Not Found', 200));
   }
   for (let i = 0; i < product.images.length; i++) {
     await cloudinary.uploader.destroy(product.images[i].public_id);
@@ -72,13 +71,13 @@ exports.deleteProduct = catchAsyncError(async (req, res, next) => {
   await product.remove();
   res.status(200).json({
     success: true,
-    message: 'Product deleted',
+    message: 'NewArrival deleted',
   });
 });
 
 // send all product details
 exports.getAllProducts = catchAsyncError(async (req, res) => {
-  const products = await Product.find();
+  const products = await NewArrival.find();
   const data = products.map((item, index) => {
     const {
       _id: id,
@@ -117,11 +116,11 @@ exports.getAllProducts = catchAsyncError(async (req, res) => {
 // send only a single product detaisl
 exports.getSingleProduct = catchAsyncError(async (req, res, next) => {
   if (!req.params.id) {
-    return next(new ErrorHandler('Product Not Found', 400));
+    return next(new ErrorHandler('NewArrival Not Found', 400));
   }
-  const product = await Product.findById(req.params.id);
+  const product = await NewArrival.findById(req.params.id);
   if (!product) {
-    return next(new ErrorHandler('Product Not Found', 200));
+    return next(new ErrorHandler('NewArrival Not Found', 200));
   }
   res.status(200).json({
     success: true,
@@ -142,7 +141,7 @@ exports.createProductReview = catchAsyncError(async (req, res, next) => {
     rating: Number(rating),
     comment,
   };
-  const product = await Product.findById(productId);
+  const product = await NewArrival.findById(productId);
   // check if the user already reviewed
   const isReviewed = product.reviews.some((rev) => rev.email === email);
   // user already review: update the review
@@ -171,18 +170,18 @@ exports.createProductReview = catchAsyncError(async (req, res, next) => {
   // send success response
   res.status(200).json({
     success: true,
-    message: 'Product review created',
+    message: 'NewArrival review created',
   });
 });
 
 // send all product reviews
 exports.getAllReviews = catchAsyncError(async (req, res, next) => {
   if (!req.params.id) {
-    return next(new ErrorHandler('Product not found', 400));
+    return next(new ErrorHandler('NewArrival not found', 400));
   }
-  const product = await Product.findById(req.params.id);
+  const product = await NewArrival.findById(req.params.id);
   if (!product) {
-    return next(new ErrorHandler('Product not found', 200));
+    return next(new ErrorHandler('NewArrival not found', 200));
   }
   const reviews = product.reviews;
   res.status(200).json({
@@ -194,15 +193,15 @@ exports.getAllReviews = catchAsyncError(async (req, res, next) => {
 // delete product review
 exports.deleteReview = catchAsyncError(async (req, res, next) => {
   if (!req.params.id) {
-    return next(new ErrorHandler('Product not found', 400));
+    return next(new ErrorHandler('NewArrival not found', 400));
   }
   const { reviewId } = req.body;
   if (!reviewId) {
     return next(new ErrorHandler('Review not found', 400));
   }
-  const product = await Product.findById(req.params.id);
+  const product = await NewArrival.findById(req.params.id);
   if (!product) {
-    return next(new ErrorHandler('Product not found', 200));
+    return next(new ErrorHandler('NewArrival not found', 200));
   }
   const reviews = product.reviews.filter(
     (rev) => rev._id.toString() !== reviewId.toString()
@@ -214,7 +213,7 @@ exports.deleteReview = catchAsyncError(async (req, res, next) => {
   avg = avg / reviews.length;
   const rating = avg || 0;
   const numberOfReviews = reviews.length;
-  await Product.findByIdAndUpdate(
+  await NewArrival.findByIdAndUpdate(
     req.params.id,
     {
       rating,

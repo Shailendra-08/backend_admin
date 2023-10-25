@@ -1,9 +1,9 @@
 const router = require('express').Router();
-
 const adminController = require('../controllers/adminController');
 const productController = require('../controllers/productController');
 const orderController = require('../controllers/orderController');
 
+const newArrivalController = require('../controllers/newArrivalController');
 const auth = require('../middleware/Auth');
 
 router.route('/auth').post(adminController.sendCurrentUser);
@@ -80,6 +80,40 @@ router
     auth.checkUserAuthentication,
     auth.checkAdminPrivileges('moderate', 'super'),
     productController.deleteReview
+  );
+
+// new Arrival
+
+// create a new product
+router
+  .route('/create/newArrival')
+  .post(
+    auth.checkUserAuthentication,
+    auth.checkAdminPrivileges('moderate', 'super', 'low'),
+    newArrivalController.createProduct
+  );
+  
+// send, update, delete a single product
+router
+  .route('/newArrival/:id')
+  .put(
+    auth.checkUserAuthentication,
+    auth.checkAdminPrivileges('moderate', 'super'),
+    newArrivalController.updateProduct
+  )
+  .delete(
+    auth.checkUserAuthentication,
+    auth.checkAdminPrivileges('moderate', 'super'),
+    newArrivalController.deleteProduct
+  );
+
+// delete product reviews
+router
+  .route('/newArrival/review/:id')
+  .delete(
+    auth.checkUserAuthentication,
+    auth.checkAdminPrivileges('moderate', 'super'),
+    newArrivalController.deleteReview
   );
 
 // send all orders

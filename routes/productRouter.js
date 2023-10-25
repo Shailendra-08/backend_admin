@@ -2,7 +2,7 @@ const router = require('express').Router();
 
 const productController = require('../controllers/productController');
 
-// send all product detaisl
+// send all product details
 router.route('/').get(productController.getAllProducts);
 
 // send a single product
